@@ -1,0 +1,54 @@
+`
+# Dependencies
+node_modules/
+.pnpm-store/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+**/dist/
+
+# Environment variables - NEVER COMMIT THESE!
+.env
+.env.local
+.env*.local
+apps/api/.env
+apps/web/.env.local
+edge/hash-object/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Supabase local
+.supabase/
+**/functions/.supabase/
+
+# Testing
+coverage/
+*.tsbuildinfo
+
+# Misc
+.eslintcache
+```

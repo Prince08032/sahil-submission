@@ -1,0 +1,22 @@
+{
+  "name": "secure-media-vault",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter web dev\" \"pnpm --filter api dev\"",
+    "build": "pnpm --filter api build && pnpm --filter web build",
+    "test": "pnpm --filter api test",
+    "db:reset": "supabase db reset",
+    "db:migrate": "supabase migration up",
+    "db:seed": "supabase db seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  }
+}

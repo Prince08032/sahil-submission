@@ -1,0 +1,26 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@graphql-tools/schema": "^10.0.25",
+    "@supabase/supabase-js": "^2.39.7",
+    "dotenv": "^17.2.3",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6",
+    "graphql-yoga": "^5.1.1",
+    "nanoid": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
+  }
+}
