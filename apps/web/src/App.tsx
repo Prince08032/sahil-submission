@@ -1,5 +1,6 @@
 // apps/web/src/App.tsx
 import React, { useState, useEffect, useCallback } from "react";
+import type { ReactElement } from "react";
 import { createClient } from "@supabase/supabase-js";
 import {
   Upload,
@@ -72,13 +73,13 @@ const supabase = createClient(
 async function graphqlRequest(query: string, variables?: unknown) {
 
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  
-  
+
+
   if (!session) {
     console.error('No active session found');
     throw new Error('No active session. Please login again.');
   }
-  
+
   if (sessionError) {
     console.error('Session error:', sessionError);
     throw new Error('Session error: ' + sessionError.message);
@@ -100,7 +101,7 @@ async function graphqlRequest(query: string, variables?: unknown) {
     body: JSON.stringify({ query, variables }),
   });
 
-  
+
   const text = await response.text();
   let result;
   try {
@@ -114,13 +115,13 @@ async function graphqlRequest(query: string, variables?: unknown) {
   if (result.errors && result.errors.length) {
     const first = result.errors[0];
 
-  
+
     if (first.extensions?.code === 'UNAUTHENTICATED') {
-     
+
       // Try to refresh session
       const { data: refreshData } = await supabase.auth.refreshSession();
       if (refreshData.session) {
-  
+
         throw new Error('Session expired. Please retry your action.');
       } else {
         console.error(' Cannot refresh session - please login again');
@@ -128,7 +129,7 @@ async function graphqlRequest(query: string, variables?: unknown) {
         throw new Error('Session expired. Please login again.');
       }
     }
-    
+
     const msg = first.message || "GraphQL error";
     throw new Error(`${msg} | details: ${JSON.stringify(result.errors)}`);
   }
@@ -145,7 +146,7 @@ async function computeSHA256(file: File): Promise<string> {
 }
 
 // === App ===
-export default function App(): JSX.Element {
+export default function App(): ReactElement {
   const [user, setUser] = useState<any>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [uploads, setUploads] = useState<Map<string, UploadState>>(new Map());
@@ -169,7 +170,7 @@ export default function App(): JSX.Element {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
       setUser(session?.user ?? null);
-      
+
       // Clear assets when logging out
       if (!session) {
         setAssets([]);
@@ -215,9 +216,9 @@ export default function App(): JSX.Element {
       setAssets([]);
       return;
     }
-    
+
     console.log('Loading assets for user:', user.id);
-    
+
     try {
       const data = await graphqlRequest(`
         query {
@@ -251,20 +252,20 @@ export default function App(): JSX.Element {
         if (error) throw error;
         console.log('Sign in successful:', data.user?.email);
       } else {
-      
-        const { data, error } = await supabase.auth.signUp({ email, password });
+
+        const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-       
+
         alert("Sign up successful — check your email (if confirmation enabled).");
       }
     } catch (err: any) {
-  
+
       alert(err.message || String(err));
     }
   };
 
   const handleSignOut = async () => {
-  
+
     await supabase.auth.signOut();
     setAssets([]);
     setDownloadLinks(new Map());
@@ -498,8 +499,8 @@ export default function App(): JSX.Element {
 
   const getDownloadLink = async (assetId: string) => {
     try {
-   
-      
+
+
       const data = await graphqlRequest(
         `
         query($assetId: ID!) {
@@ -510,20 +511,20 @@ export default function App(): JSX.Element {
       `,
         { assetId }
       );
-      
+
       const link = data.getDownloadUrl;
- 
-      
+
+
       await navigator.clipboard.writeText(link.url);
       const expiresAt = new Date(link.expiresAt).getTime();
       const secondsRemaining = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
-      
+
       setDownloadLinks((prev) => {
         const next = new Map(prev);
         next.set(assetId, { url: link.url, expiresAt: link.expiresAt, secondsRemaining });
         return next;
       });
-      
+
       alert(`Link copied. Expires in ${secondsRemaining}s.`);
     } catch (err: any) {
 
@@ -637,7 +638,7 @@ export default function App(): JSX.Element {
               <input type="checkbox" checked={devMode} onChange={(e) => setDevMode(e.target.checked)} />
               Dev Mode (15% fail)
             </label>
-            {offline && <div className="text-red-600 flex items-center gap-1"><WifiOff size={14}/> Offline</div>}
+            {offline && <div className="text-red-600 flex items-center gap-1"><WifiOff size={14} /> Offline</div>}
             <span className="text-sm text-gray-600">{user.email}</span>
             <button onClick={handleSignOut} className="px-4 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300">Sign Out</button>
           </div>
@@ -688,7 +689,13 @@ export default function App(): JSX.Element {
 }
 
 // UploadCard component
-function UploadCard({ upload, onCancel, onRetry }: any) {
+interface UploadCardProps {
+  upload: UploadState;
+  onCancel: () => void;
+  onRetry: () => void;
+}
+
+function UploadCard({ upload, onCancel, onRetry }: UploadCardProps) {
   const statusColors: Record<AssetStatus, string> = {
     draft: "bg-gray-100 text-gray-700",
     uploading: "bg-blue-100 text-blue-700",
