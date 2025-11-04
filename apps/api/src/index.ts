@@ -39,6 +39,7 @@ const yoga = createYoga({
   cors: {
     origin: [
       "http://localhost:3000",
+      "http://localhost:5173",
       "https://sahil-submission-web.onrender.com",
     ],
     methods: ["GET", "POST", "OPTIONS"],
