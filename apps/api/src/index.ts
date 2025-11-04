@@ -36,6 +36,23 @@ console.log("Schema compiled successfully");
 
 const yoga = createYoga({
   schema,
+  cors: {
+    origin: [
+      "http://localhost:3000",
+      "https://sahil-submission-web.onrender.com",
+    ],
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Accept",
+      "Origin",
+      "X-Requested-With",
+      "apollo-require-preflight",
+      "x-user-id",
+    ],
+    // credentials: true, // Uncomment if needed for cookies/auth
+  },
   context: async ({ request }) => {
     const authHeader = request.headers.get("authorization");
     const token = authHeader?.replace("Bearer ", "").trim();
@@ -44,7 +61,6 @@ const yoga = createYoga({
 
     if (token) {
       try {
-        // ✅ Use ANON key for auth validation
         const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
         const {
           data: { user },
@@ -65,12 +81,9 @@ const yoga = createYoga({
       console.log("No authorization token provided");
     }
 
-    // ✅ Create user-scoped Supabase client with RLS enforcement
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: {
-        headers: token
-          ? { Authorization: `Bearer ${token}` }
-          : {},
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       },
     });
 
@@ -79,18 +92,14 @@ const yoga = createYoga({
       userId,
     };
   },
-  cors: {
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-    credentials: true,
-  },
 });
 
 const server = createServer(yoga);
 
-const PORT = process.env.PORT || 4000;
+const PORT = Number(process.env.PORT || 4000);
 
 server.listen(PORT, () => {
-  console.log(`GraphQL API running on http://localhost:${PORT}/graphql`);
-  console.log(`Playground available at http://localhost:${PORT}/graphql`);
-  console.log(`Auth middleware active`);
+  console.log(`🚀 GraphQL API running on http://localhost:${PORT}/graphql`);
+  console.log(`✅ Playground available at http://localhost:${PORT}/graphql`);
+  console.log(`🔒 Auth middleware active`);
 });
